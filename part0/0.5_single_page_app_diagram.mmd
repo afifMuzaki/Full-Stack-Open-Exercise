@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor User
+    participant Browser
+    participant Server
+
+    User->>Browser: The user access SPA notes page
+
+    Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/spa
+    activate Server
+    Server-->>Browser: HTML Document
+    deactivate Server
+
+    Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
+    activate Server
+    Server-->>Browser: CSS File
+    deactivate Server
+
+    Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/spa.js
+    activate Server
+    Server-->>Browser: JS File
+    deactivate Server
+
+    Note right of Browser: The browser starts executing the Javascript code that fetches JSON data from the server
+
+    Browser->>Server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
+    activate Server
+    Server-->>Browser: [{"content": "Test", "date": "2024-01-24"}, ..]
+    deactivate Server
+
+    Note right of Browser: Browser executes the callback function to render the notes
+
+    Browser-->>User: Show SPA notes page
