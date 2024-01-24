@@ -1,0 +1,41 @@
+sequenceDiagram
+    actor User
+    participant Browser
+    participant Server
+
+    User ->> Browser: Write and post a new note
+
+    Note right of User: The user creates a new note and click the save button
+
+    Browser ->> Server: POST https://studies.cs.helsinki.fi/exampleapp/new_note
+    activate Server
+    Server -->> Browser: Status code 302
+    deactivate Server
+
+    Note right of Browser: The server asks the browser to make an HTTP GET request to the address in the location header.
+
+    Browser ->> Server: GET https://studies.cs.helsinki.fi/exampleapp/notes
+    activate Server
+    Server -->> Browser: HTML Document
+    deactivate Server
+
+    Browser ->> Server: GET https://studies.cs.helsinki.fi/exampleapp/main.css
+    activate Server
+    Server -->> Browser: CSS File
+    deactivate Server
+
+    Browser ->> Server: GET https://studies.cs.helsinki.fi/exampleapp/main.js
+    activate Server
+    Server -->> Browser: JS File
+    deactivate Server
+
+    Note right of Browser: The browser starts executing the Javascript code that fetches JSON data from the server
+
+    Browser ->> Server: GET https://studies.cs.helsinki.fi/exampleapp/data.json
+    activate Server
+    Server -->> Browser: [{"content": "Test", "date": "2024-01-24"}, ..]
+    deactivate Server
+
+    Note right of Browser: Browser executes the callback function to render the notes
+
+    Browser -->> User: Show refreshed notes page
