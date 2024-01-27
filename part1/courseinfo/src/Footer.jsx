@@ -1,7 +1,7 @@
 const Footer = (props) => {
     return (
         <>
-            <p>Number of exercises {props.exercise[0] + props.exercise[1] + props.exercise[2]}</p>
+            <p>Number of exercises {props.parts.parts[0].exercises + props.parts.parts[1].exercises + props.parts.parts[2].exercises}</p>
         </>
     );
 }
