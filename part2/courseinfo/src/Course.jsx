@@ -3,10 +3,9 @@ import Content from './Content';
 
 const Course = ({ courses }) => {
 
-    const sumExercise = (parts) => {
-        return parts.map(part => part.exercises)
+    const sumExercise = (parts) => 
+	parts.map(part => part.exercises)
         .reduce((acc, cur) => acc + cur);
-    };
 
     return (
         <>
