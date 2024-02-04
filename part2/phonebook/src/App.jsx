@@ -3,12 +3,14 @@ import personService from './services/persons';
 import PersonForm from './PersonForm';
 import Persons from './Persons';
 import Filter from './Filter';
+import Message from './Message';
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [filter, setFilter] = useState('');
+  const [message, setMessage] = useState({});
 
   useEffect(() => {
     personService.getAll()
@@ -16,8 +18,12 @@ const App = () => {
         setPersons(persons);
       })
       .catch(err => {
-        alert('Oopps! Something wrong');
+        setMessage({ type: 'error', text: 'Oopps! Something wrong' });
         console.error(err.message);
+
+        setTimeout(() => {
+          setMessage({})
+        }, 5000);
       });
   }, []);
 
@@ -31,14 +37,32 @@ const App = () => {
       { ...personData, number: newNumber }
     )
       .then(res => {
-        const filtered = persons.filter(person => person.id !== res.id);
-        setPersons(filtered.concat(res));
+        const filtered = persons.map(person => {
+          if (person.id === res.id) {
+            return {...person, number: res.number};
+          }
+
+          return person;
+        });
+
+        setPersons(filtered);
+        setMessage({ type: 'success', text: `${res.name}'s number was successfully updated` });
         setNewName('');
         setNewNumber('');
+
+        setTimeout(() => {
+          setMessage({})
+        }, 5000);
       })
       .catch(err => {
-        alert('Oopps! Something wrong');
+        setMessage({ type: 'error', text: `Information of '${personData.name}' has already been removed from server` });
         console.error(err.message);
+
+        setTimeout(() => {
+          setMessage({})
+        }, 5000);
+
+        setPersons(persons.filter(person => person.id !== personData.id));
       });
   };
 
@@ -49,7 +73,7 @@ const App = () => {
     );
 
     if (!existedPerson) return false;
-    
+
     const changeConfirm = confirm(`${newName} is already added to phonebook, replace the old number with a new one?`);
     if (changeConfirm) updateNumber(existedPerson);
     return true;
@@ -57,7 +81,7 @@ const App = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!checkPersonExist()) {
       personService.create({
         name: newName,
@@ -66,12 +90,21 @@ const App = () => {
       })
         .then(addedPerson => {
           setPersons(persons.concat(addedPerson));
+          setMessage({ type: 'success', text: `Added ${newName}` })
           setNewName('');
           setNewNumber('');
+
+          setTimeout(() => {
+            setMessage({})
+          }, 5000)
         })
         .catch(err => {
-          alert('Oopps! Something wrong');
+          setMessage({ type: 'error', text: 'Oopps! Something wrong' });
           console.error(err.message);
+
+          setTimeout(() => {
+            setMessage({})
+          }, 5000);
         });
     }
   };
@@ -83,8 +116,12 @@ const App = () => {
           setPersons(persons.filter(person => person.id !== res));
         })
         .catch(err => {
-          alert('Oopps! Something wrong');
+          setMessage({ type: 'error', text: 'Oopps! Something wrong' });
           console.error(err.message);
+
+          setTimeout(() => {
+            setMessage({})
+          }, 5000);
         });
     }
   };
@@ -96,6 +133,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Message message={message} />
       <Filter filterValue={filter} handleChange={handleFilterChange} />
 
       <h3>Add a new</h3>
