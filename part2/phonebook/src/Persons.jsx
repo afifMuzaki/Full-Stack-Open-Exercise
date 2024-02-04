@@ -1,8 +1,12 @@
-const Persons = ({ persons }) => {
+import Button from "./Button";
+
+const Persons = ({ persons, handleDelete }) => {
     return (
         <>
             {persons.map(person =>
-                <p key={person.name}>{person.name} {person.number}</p>
+                <p key={person.id}>
+                    {person.name} {person.number} <Button title='delete' handleClick={() => handleDelete(person.id, person.name)} />
+                </p>
             )}
         </>
     );

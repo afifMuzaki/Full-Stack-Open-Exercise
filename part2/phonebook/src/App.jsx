@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+import personService from './services/persons';
 import PersonForm from './PersonForm';
 import Persons from './Persons';
 import Filter from './Filter';
@@ -11,37 +11,82 @@ const App = () => {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons')
-    .then(response => {
-      setPersons(response.data);
-    })
-    .catch(err => {
-      alert('Error: unable to connect to server');
-      console.error(err.message);
-    });
+    personService.getAll()
+      .then(persons => {
+        setPersons(persons);
+      })
+      .catch(err => {
+        alert('Oopps! Something wrong');
+        console.error(err.message);
+      });
   }, []);
 
-  const shownPerson = filter ? persons.filter(person => 
+  const shownPerson = filter ? persons.filter(person =>
     person.name.toLowerCase().includes(filter.toLowerCase())
   ) : persons;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const isNameExist = persons.find(person => 
-      person.name.toLowerCase()
-      .includes(newName.toLowerCase())
+  const updateNumber = (personData) => {
+    personService.update(
+      personData.id,
+      { ...personData, number: newNumber }
+    )
+      .then(res => {
+        const filtered = persons.filter(person => person.id !== res.id);
+        setPersons(filtered.concat(res));
+        setNewName('');
+        setNewNumber('');
+      })
+      .catch(err => {
+        alert('Oopps! Something wrong');
+        console.error(err.message);
+      });
+  };
+
+  const checkPersonExist = () => {
+    const existedPerson = persons.find(person =>
+      person.name.toLowerCase().
+        includes(newName.toLowerCase())
     );
 
-    if (isNameExist) return alert(`${newName} is already added to phonebook`);
+    if (!existedPerson) return false;
+    
+    const changeConfirm = confirm(`${newName} is already added to phonebook, replace the old number with a new one?`);
+    if (changeConfirm) updateNumber(existedPerson);
+    return true;
+  };
 
-    setPersons(persons.concat({ 
-      name: newName, 
-      number: newNumber, 
-      id: persons.length + 1 
-    }));
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!checkPersonExist()) {
+      personService.create({
+        name: newName,
+        number: newNumber,
+        id: (persons.length + 1).toString(),
+      })
+        .then(addedPerson => {
+          setPersons(persons.concat(addedPerson));
+          setNewName('');
+          setNewNumber('');
+        })
+        .catch(err => {
+          alert('Oopps! Something wrong');
+          console.error(err.message);
+        });
+    }
+  };
 
-    setNewName('');
-    setNewNumber('');
+  const handleDeleteClick = (id, name) => {
+    if (confirm(`Delete ${name} ?`)) {
+      personService.destroy(id)
+        .then(res => {
+          setPersons(persons.filter(person => person.id !== res));
+        })
+        .catch(err => {
+          alert('Oopps! Something wrong');
+          console.error(err.message);
+        });
+    }
   };
 
   const handleNameChange = (e) => setNewName(e.target.value);
@@ -60,7 +105,7 @@ const App = () => {
         inputValue={{ newName, newNumber }} />
 
       <h3>Numbers</h3>
-      <Persons persons={shownPerson} />
+      <Persons persons={shownPerson} handleDelete={handleDeleteClick} />
     </div>
   )
 }
