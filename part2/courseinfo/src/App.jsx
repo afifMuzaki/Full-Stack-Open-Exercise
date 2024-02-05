@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import Course from './Course'
+import Course from './components/Course'
 
 const App = () => {
   const courses = [
