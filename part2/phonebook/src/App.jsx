@@ -86,7 +86,7 @@ const App = () => {
       personService.create({
         name: newName,
         number: newNumber,
-        id: (persons.length + 1).toString(),
+        // id: (persons.length + 1).toString(),
       })
         .then(addedPerson => {
           setPersons(persons.concat(addedPerson));
