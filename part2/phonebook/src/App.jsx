@@ -99,8 +99,8 @@ const App = () => {
           }, 5000)
         })
         .catch(err => {
-          setMessage({ type: 'error', text: 'Oopps! Something wrong' });
-          console.error(err.message);
+          setMessage({ type: 'error', text: (err.response.data.error) ? err.response.data.error : 'Oopps! Something wrong' });
+          console.error(err);
 
           setTimeout(() => {
             setMessage({})
