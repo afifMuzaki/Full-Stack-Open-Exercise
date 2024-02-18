@@ -90,7 +90,7 @@ const App = () => {
       })
         .then(addedPerson => {
           setPersons(persons.concat(addedPerson));
-          setMessage({ type: 'success', text: `Added ${newName}` })
+          setMessage({ type: 'success', text: `Added ${newName}` });
           setNewName('');
           setNewNumber('');
 
@@ -107,13 +107,18 @@ const App = () => {
           }, 5000);
         });
     }
-  };
+  };newName
 
   const handleDeleteClick = (id, name) => {
     if (confirm(`Delete ${name} ?`)) {
       personService.destroy(id)
-        .then(res => {
-          setPersons(persons.filter(person => person.id !== res));
+        .then(() => {
+          setPersons(persons.filter(person => person.id !== id));
+          setMessage({ type: 'success', text: `Deleted ${name}` });
+
+          setTimeout(() => {
+            setMessage({})
+          }, 5000);
         })
         .catch(err => {
           setMessage({ type: 'error', text: 'Oopps! Something wrong' });
