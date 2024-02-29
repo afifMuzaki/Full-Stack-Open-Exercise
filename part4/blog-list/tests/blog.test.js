@@ -1,110 +1,130 @@
-const { test, after, beforeEach, describe } = require('node:test');
-const assert = require('node:assert');
-const supertest = require('supertest');
-const Blog = require('../models/blog');
-const app = require('../app');
-const mongoose = require('mongoose');
+const { test, after, beforeEach, describe } = require("node:test");
+const assert = require("node:assert");
+const supertest = require("supertest");
+const Blog = require("../models/blog");
+const app = require("../app");
+const mongoose = require("mongoose");
 
 const api = supertest(app);
 
-beforeEach(async () => {
-    await Blog.deleteMany({});
-    const initialBlogs = [
-        {
-            title: "React patterns",
-            author: "Michael Chan",
-            url: "https://reactpatterns.com/",
-            likes: 7
-        },
-        {
-            title: "Go To Statement Considered Harmful",
-            author: "Edsger W. Dijkstra",
-            url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
-            likes: 5
-        },
-    ];
+describe("when there is initially some blogs saved", () => {
+    beforeEach(async () => {
+        await Blog.deleteMany({});
+        const initialBlogs = [
+            {
+                title: "React patterns",
+                author: "Michael Chan",
+                url: "https://reactpatterns.com/",
+                likes: 7
+            },
+            {
+                title: "Go To Statement Considered Harmful",
+                author: "Edsger W. Dijkstra",
+                url: "http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html",
+                likes: 5
+            },
+        ];
 
-    const blogObjects = initialBlogs
-        .map(blog => new Blog(blog));
-    const promiseArray = blogObjects.map(blog => blog.save());
-    await Promise.all(promiseArray);
-});
-
-describe('blogs as json', () => {
-    test('blogs are returned as json', async () => {
-        await api.get('/api/blogs')
-            .expect(200)
-            .expect('Content-Type', /application\/json/);
+        const blogObjects = initialBlogs
+            .map(blog => new Blog(blog));
+        const promiseArray = blogObjects.map(blog => blog.save());
+        await Promise.all(promiseArray);
     });
-});
 
-describe('unique identifier', () => {
-    test('unique identifier property of the blog posts is named id', async () => {
-        const result = await api.get('/api/blogs');
+    test("blogs returned as json", async () => {
+        await api.get("/api/blogs")
+            .expect(200)
+            .expect("Content-Type", /application\/json/);
+    });
 
-        const validIdentifier = result.body.every(blog => blog.hasOwnProperty('id'));
+    test("unique identifier property of the blog posts should be named id", async () => {
+        const result = await api.get("/api/blogs");
+
+        const validIdentifier = result.body.every(blog => blog.hasOwnProperty("id"));
         assert(validIdentifier);
     });
-});
 
-describe('create a new blog', () => {
-    test('successfully create a new blog post', async () => {
-        const newPost = {
-            title: "Lorem ipsum dolor",
-            author: "Jhon Doe",
-            url: "https://example.com/",
-            likes: 4
-        }
+    describe("addition of a new blog", () => {
+        test("successfully adding a new blog post", async () => {
+            const newPost = {
+                title: "Lorem ipsum dolor",
+                author: "Jhon Doe",
+                url: "https://example.com/",
+                likes: 4
+            }
 
-        // Count the number of current blog posts
-        const currentBlogs = await Blog.countDocuments({});
+            const currentBlogs = await Blog.countDocuments({});
 
-        // Post a new blog
-        await api.post('/api/blogs')
-            .send(newPost)
-            .set('Content-Type', 'application/json')
-            .expect(201);
+            await api.post("/api/blogs")
+                .send(newPost)
+                .set("Content-Type", "application/json")
+                .expect(201);
 
-        // Count the number of recent blog posts       
-        const recentBlogs = await Blog.countDocuments({});
-        // Checking whether recentBlogs equals (currentBlogs + 1)
-        assert.strictEqual(recentBlogs, (currentBlogs + 1));
+            const recentBlogs = await Blog.countDocuments({});
 
-        // Get the latest blog posts
-        const latestBlog = await Blog.findOne({}).sort({ _id: -1 });
-        // Checking whether latestBlog equals newPost
-        assert.deepStrictEqual({
-            title: latestBlog.title,
-            author: latestBlog.author,
-            url: latestBlog.url,
-            likes: latestBlog.likes
-        }, newPost);
-    });
-});
+            assert.strictEqual(recentBlogs, (currentBlogs + 1));
 
-describe('missing properties', () => {
-    test('if request likes property is missing, set it to 0', async () => {
-        const postWithoutLikes = {
-            title: "Blog whitout likes property",
-            author: "Jhon Doe",
-            url: "https://example.com/jhon-doe/no-likes",
-        };
+            const latestBlog = await Blog.findOne({}).sort({ _id: -1 });
 
-        const blog = await api.post('/api/blogs')
-            .send(postWithoutLikes);
-
-        assert.strictEqual(blog._body.likes, 0);
+            assert.deepStrictEqual({
+                title: latestBlog.title,
+                author: latestBlog.author,
+                url: latestBlog.url,
+                likes: latestBlog.likes
+            }, newPost);
+        });
     });
 
-    test('if request title or url property are missing, return status code 400 bad request', async () => {
-        const postWithoutUrl = {
-            title: "Blog whitout url property",
-            author: "Jhon Doe",
-        };
+    describe("missing properties", () => {
+        test("if request's likes property is missing, set it to 0", async () => {
+            const postWithoutLikes = {
+                title: "Blog whitout likes property",
+                author: "Jhon Doe",
+                url: "https://example.com/jhon-doe/no-likes",
+            };
 
-        await api.post('/api/blogs')
-            .send(postWithoutUrl)
-            .expect(400);
+            const blog = await api.post("/api/blogs")
+                .send(postWithoutLikes);
+
+            assert.strictEqual(blog._body.likes, 0);
+        });
+
+        test("if request's title or url property is missing, return status code 400 bad request", async () => {
+            const postWithoutUrl = {
+                title: "Blog whitout url property",
+                author: "Jhon Doe",
+            };
+
+            await api.post("/api/blogs")
+                .send(postWithoutUrl)
+                .expect(400);
+        });
+    });
+
+    describe("deletion of a blog", () => {
+        test("succeeds with status code 204 if id is valid", async () => {
+            const latestBlog = await Blog.findOne({}).sort({ _id: -1 });
+
+            await api.delete(`/api/blogs/${latestBlog._id}`)
+                .expect(204);
+        });
+    });
+
+    describe("update an existing blog", () => {
+        test("succeeds with status code 200 if id is valid", async () => {
+            const latestBlog = await Blog.findOne({}).sort({ _id: -1 });
+
+            const newBlogUpdate = {
+                title: "Updated Blog",
+                author: "Jhon Doe",
+                url: "https://example.com/jhon-doe/updated-blog",
+                likes: 9
+            }
+
+            await api.put(`/api/blogs/${latestBlog._id}`)
+                .send(newBlogUpdate)
+                .expect(200);
+        });
     });
 });
 
