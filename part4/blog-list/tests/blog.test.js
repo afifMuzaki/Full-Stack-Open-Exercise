@@ -1,11 +1,52 @@
 const { test, after, beforeEach, describe } = require("node:test");
 const assert = require("node:assert");
 const supertest = require("supertest");
-const Blog = require("../models/blog");
-const app = require("../app");
-const mongoose = require("mongoose");
+// const Blog = require("../models/blog");
+// const User = require("../models/user");
+// const app = require("../app");
+// const mongoose = require("mongoose");
 
 const api = supertest(app);
+
+beforeEach(async () => {
+    await User.deleteMany({});
+
+    const userInit = new User({
+        username: "jhon123",
+        name: "Jhon Doe",
+        password: "mypassword",
+    });
+
+    await userInit.save();
+});
+
+describe('invalid users will not be created', () => {
+    test('users with the same username will not be created', async () => {
+        const duplicateUserName = {
+            username: "jhon123",
+            name: "Jhon Doe",
+            password: "password",
+        };
+
+        await api.post('/api/users')
+            .send(duplicateUserName)
+            .expect(400)
+            .expect(res => assert.strictEqual(res.body.error, 'expected `username` to be unique'));
+    });
+
+    test('users with invalid passwords will not be created', async () => {
+        const invalidPassword = {
+            username: "json_code",
+            name: "Jason Smith",
+            password: "pa",
+        };
+
+        await api.post('/api/users')
+            .send(invalidPassword)
+            .expect(400)
+            .expect(res => assert.strictEqual(res.body.error, '`password` must be at least 3 characters long'));
+    });
+});
 
 describe("when there is initially some blogs saved", () => {
     beforeEach(async () => {

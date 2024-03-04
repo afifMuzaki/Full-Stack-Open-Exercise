@@ -1,30 +1,32 @@
 const logger = require('./logger');
 require('dotenv').config();
 
-const requestLogger = (request, response, next) => {
+const requestLogger = (req, res, next) => {
     if (process.env.NODE_ENV !== 'test') {
-        logger.info('Method:', request.method);
-        logger.info('Path:  ', request.path);
-        logger.info('Body:  ', request.body);
+        logger.info('Method:', req.method);
+        logger.info('Path:  ', req.path);
+        logger.info('Body:  ', req.body);
         logger.info('---');
     }
-    
+
     next();
 };
 
-const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: 'unknown endpoint' });
+const unknownEndpoint = (req, res) => {
+    res.status(404).send({ error: 'unknown endpoint' });
 };
 
-const errorHandler = (error, request, response, next) => {
-    logger.error(error.message);
-
+const errorHandler = (error, req, res, next) => {
     if (error.name === 'CastError') {
-        return response.status(400).send({ error: 'malformatted id' });
+        return res.status(400).send({ error: 'malformatted id' });
     }
 
     if (error.name === 'ValidationError') {
-        return response.status(400).json({ error: error.message });
+        return res.status(400).json({ error: error.message });
+    }
+
+    if (error.name === 'MongoServerError' && error.code === 11000) {
+        return res.status(400).json({ error: 'expected `username` to be unique' });
     }
 
     next(error);
