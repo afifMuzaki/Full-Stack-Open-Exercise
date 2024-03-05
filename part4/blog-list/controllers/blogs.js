@@ -8,27 +8,40 @@ blogRouter.get('/', async (req, res) => {
 });
 
 blogRouter.post('/', async (req, res) => {
+    const reqUser = req.user;
+
     if (!req.body.title || !req.body.url) return res.status(400).json({ error: 'Title or URL not defined' });
 
-    const users = await User.find({});
-    const randNum = Math.floor(Math.random() * users.length);
+    if (!reqUser.id) {
+        return res.status(401).json({ error: 'token invalid' });
+    }
+
+    const user = await User.findById(reqUser.id);
 
     const newRequest = (!req.body.likes) ?
-        { ...req.body, likes: 0, user: users[randNum].id }
-        : { ...req.body, user: users[randNum].id };
+        { ...req.body, likes: 0, user: user.id }
+        : { ...req.body, user: user.id };
 
     const blog = new Blog(newRequest);
     const result = await blog.save();
 
-    users[randNum].blogs = users[randNum].blogs.concat(result._id);
-    await users[randNum].save();
+    user.blogs = user.blogs.concat(result._id);
+    await user.save();
     
     res.status(201).json(result);
 });
 
 blogRouter.delete('/:id', async (req, res) => {
+    const reqUser = req.user;
+    
     const id = req.params.id;
-    const result = await Blog.findByIdAndDelete(id);
+    const blog = await Blog.findById(id);
+
+    if (!reqUser.id || (blog.user.toString() !== reqUser.id.toString())) {
+        return res.status(401).json({ error: 'token invalid' });
+    }
+
+    const result = await blog.deleteOne();
     res.status(204).json(result);
 });
 

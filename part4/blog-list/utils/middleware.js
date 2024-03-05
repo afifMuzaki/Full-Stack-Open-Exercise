@@ -1,4 +1,5 @@
 const logger = require('./logger');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const requestLogger = (req, res, next) => {
@@ -7,6 +8,22 @@ const requestLogger = (req, res, next) => {
         logger.info('Path:  ', req.path);
         logger.info('Body:  ', req.body);
         logger.info('---');
+    }
+
+    next();
+};
+
+const userExtractor = (req, res, next) => {
+    req.user = jwt.verify(req.token, process.env.SECRET);
+    next();
+};
+
+const tokenExtractor = (req, res, next) => {
+    const authorization = req.get('authorization');
+    if (authorization && authorization.startsWith('Bearer ')) {
+        req.token = authorization.replace('Bearer ', '');
+    } else {
+        req.token = null;
     }
 
     next();
@@ -29,11 +46,17 @@ const errorHandler = (error, req, res, next) => {
         return res.status(400).json({ error: 'expected `username` to be unique' });
     }
 
+    if (error.name === 'JsonWebTokenError') {
+        return res.status(400).json({ error: 'token missing or invalid' });
+    }
+
     next(error);
 };
 
 module.exports = {
     requestLogger,
+    userExtractor,
+    tokenExtractor,
     unknownEndpoint,
     errorHandler
 };
