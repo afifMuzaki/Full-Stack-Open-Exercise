@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Blog from "./components/Blog";
 import LoginForm from "./components/LoginForm";
 import BlogForm from "./components/BlogForm";
 import FlashMessage from "./components/FlashMessage";
+import Togglable from "./components/Togglable";
 import blogService from "./services/blogs";
 import loginService from "./services/login";
 
@@ -11,9 +12,6 @@ const App = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-  const [title, setTitle] = useState("");
-  const [author, setAuthor] = useState("");
-  const [url, setUrl] = useState("");
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
@@ -34,6 +32,8 @@ const App = () => {
     }
   }, []);
 
+  const blogFormRef = useRef();
+
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -53,21 +53,16 @@ const App = () => {
     }
   };
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-
+  const handleCreate = async ({ title, author, url }) => {
     try {
+      blogFormRef.current.toggleVisibility();
       const response = await blogService.create({ title, author, url });
       setBlogs(blogs.concat(response));
-      setTitle("");
-      setAuthor("");
-      setUrl("");
 
       setMessage({ type: "success", text: `a new blog ${title} by ${author} added` });
       setTimeout(() => {
         setMessage(null);
       }, 5000);
-
     } catch (err) {
       setMessage({ type: "error", text: err.response.data.error });
       setTimeout(() => {
@@ -92,28 +87,24 @@ const App = () => {
     />
   }
 
-return (
-  <div>
-    <h2>blogs</h2>
-    <FlashMessage message={message} />
-    <p>
-      {user.name} logged in
-      <button onClick={handleLogout}>logout</button>
-    </p>
-    <BlogForm
-      handleCreate={handleCreate}
-      title={title}
-      author={author}
-      url={url}
-      setTitle={setTitle}
-      setAuthor={setAuthor}
-      setUrl={setUrl}
-    />
-    {blogs.map(blog =>
-      <Blog key={blog.id} blog={blog} />
-    )}
-  </div>
-);
+  return (
+    <div>
+      <h2>blogs</h2>
+      <FlashMessage message={message} />
+      <p>
+        {user.name} logged in
+        <button onClick={handleLogout}>logout</button>
+      </p>
+      <Togglable bottonLabel="new blog" ref={blogFormRef}>
+        <BlogForm
+          handleCreate={handleCreate}
+        />
+      </Togglable>
+      {blogs.map(blog =>
+        <Blog key={blog.id} blog={blog} />
+      )}
+    </div>
+  );
 }
 
 export default App
