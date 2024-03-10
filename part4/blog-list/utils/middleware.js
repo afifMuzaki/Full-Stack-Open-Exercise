@@ -14,7 +14,12 @@ const requestLogger = (req, res, next) => {
 };
 
 const userExtractor = (req, res, next) => {
-    req.user = jwt.verify(req.token, process.env.SECRET);
+    if (!req.token) {
+	req.user = null;
+    } else {
+	req.user = jwt.verify(req.token, process.env.SECRET);
+    }
+
     next();
 };
 

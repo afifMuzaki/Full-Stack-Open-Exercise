@@ -12,8 +12,8 @@ blogRouter.post('/', async (req, res) => {
 
     if (!req.body.title || !req.body.url) return res.status(400).json({ error: 'Title or URL not defined' });
 
-    if (!reqUser.id) {
-        return res.status(401).json({ error: 'token invalid' });
+    if (!reqUser || !reqUser.id) {
+        return res.status(401).json({ error: 'token missing or invalid' });
     }
 
     const user = await User.findById(reqUser.id);
