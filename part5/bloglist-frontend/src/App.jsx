@@ -53,13 +53,13 @@ const App = () => {
     }
   };
 
-  const handleCreate = async ({ title, author, url }) => {
+  const handleCreate = async (blogData) => {
     try {
-      blogFormRef.current.toggleVisibility();
-      const response = await blogService.create({ title, author, url });
+      const response = await blogService.create(blogData);
       setBlogs(blogs.concat(response));
+      blogFormRef.current.toggleVisibility();
 
-      setMessage({ type: "success", text: `a new blog ${title} by ${author} added` });
+      setMessage({ type: "success", text: `a new blog ${blogData.title} by ${blogData.author} added` });
       setTimeout(() => {
         setMessage(null);
       }, 5000);
@@ -74,6 +74,54 @@ const App = () => {
   const handleLogout = () => {
     localStorage.removeItem("loggedUser");
     setUser(null);
+  };
+
+  const handleUpdate = async (newBlog, blogId) => {
+    try {
+      const response = await blogService.update(newBlog, blogId);
+
+      const updatedBlogs = blogs.map(blog => {
+        if (blog.id === response.id) {
+          return { ...blog, likes: response.likes };
+        }
+
+        return blog;
+      });
+
+      setBlogs(updatedBlogs);
+
+      setMessage({ type: "success", text: `${newBlog.title} by ${newBlog.author} updated` });
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    } catch (err) {
+      setMessage({ type: "error", text: err.response.data.error });
+      setTimeout(() => {
+        setMessage(null);
+      }, 5000);
+    }
+  };
+
+  const handleDelete = async (blogId, title, author) => {
+    const confirm = window.confirm(`Remove blog ${title} by ${author}?`);
+
+    if (confirm) {
+      try {
+        await blogService.destroy(blogId);
+        const updatedBlogs = blogs.filter(blog => blog.id !== blogId);
+        setBlogs(updatedBlogs);
+
+        setMessage({ type: "success", text: `${title} by ${author} deleted` });
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      } catch (err) {
+        setMessage({ type: "error", text: err.response.data.error });
+        setTimeout(() => {
+          setMessage(null);
+        }, 5000);
+      }
+    }
   };
 
   if (user === null) {
@@ -100,11 +148,14 @@ const App = () => {
           handleCreate={handleCreate}
         />
       </Togglable>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
+      {(blogs.length < 1) ? <p>no saved blogs yet</p>
+        : blogs
+          .sort((a, b) => b.likes - a.likes)
+          .map(blog =>
+            <Blog key={blog.id} blog={blog} handleUpdate={handleUpdate} handleDelete={handleDelete} />
+          )}
     </div>
   );
-}
+};
 
-export default App
+export default App;

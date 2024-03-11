@@ -10,6 +10,9 @@ const BlogForm = ({
     const addBlog = (e) => {
         e.preventDefault();
         handleCreate({ title, author, url });
+        setTitle("");
+        setAuthor("");
+        setUrl("");
     };
 
     return (
