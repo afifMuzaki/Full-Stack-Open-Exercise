@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const Blog = ({ blog, handleUpdate, handleDelete }) => {
+const Blog = ({ blog, handleUpdate, handleDelete, loggedUserId }) => {
 	const [visibility, setVisibility] = useState(false);
 
 	const blogStyle = {
@@ -31,6 +31,11 @@ const Blog = ({ blog, handleUpdate, handleDelete }) => {
 		handleDelete(blog.id, blog.title, blog.author);
 	};
 
+	const removeBtnStyle = {
+		display: (blog.user.id === loggedUserId || blog.user === loggedUserId) ? "" : "none",
+		backgroundColor: "blue",
+		color: "white"
+	};
 	const hideWhenVisible = { display: visibility ? "none" : "" };
 	const showWhenVisible = { display: visibility ? "" : "none" };
 
@@ -48,7 +53,7 @@ const Blog = ({ blog, handleUpdate, handleDelete }) => {
 				<br />
 				{blog.author}
 				<br />
-				<button style={{ backgroundColor: "blue", color: "white" }} onClick={deleteBlog}>remove</button>
+				<button style={removeBtnStyle} onClick={deleteBlog}>remove</button>
 			</div>
 		</div>
 	);

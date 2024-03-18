@@ -38,7 +38,7 @@ const App = () => {
 		e.preventDefault();
 		try {
 			const user = await loginService.login({ username, password });
-
+			console.log(user);
 			blogService.setToken(user.token);
 			localStorage.setItem("loggedUser", JSON.stringify(user));
 			setUser(user);
@@ -151,7 +151,7 @@ const App = () => {
 				: blogs
 					.sort((a, b) => b.likes - a.likes)
 					.map(blog =>
-						<Blog key={blog.id} blog={blog} handleUpdate={handleUpdate} handleDelete={handleDelete} />
+						<Blog key={blog.id} blog={blog} handleUpdate={handleUpdate} handleDelete={handleDelete} loggedUserId={user.id} />
 					)}
 		</div>
 	);
