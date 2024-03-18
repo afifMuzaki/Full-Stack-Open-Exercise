@@ -23,6 +23,7 @@ const BlogForm = ({
                     title
 					<input
 						placeholder="title"
+						data-testid="title"
 						type="text"
 						name="title"
 						value={title}
@@ -32,6 +33,7 @@ const BlogForm = ({
                     author
 					<input
 						placeholder="author"
+						data-testid="author"
 						type="text"
 						name="author"
 						value={author}
@@ -41,6 +43,7 @@ const BlogForm = ({
                     url
 					<input
 						placeholder="url"
+						data-testid="url"
 						type="text"
 						name="url"
 						value={url}

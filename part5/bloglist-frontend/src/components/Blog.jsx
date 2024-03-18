@@ -44,7 +44,7 @@ const Blog = ({ blog, handleUpdate, handleDelete }) => {
 				<br />
 				<a href={blog.url}>{blog.url}</a>
 				<br />
-				likes {blog.likes} <button onClick={likeBlog} className="likeBtn">like</button>
+				likes <span data-testid="likes">{blog.likes}</span> <button onClick={likeBlog} className="likeBtn">like</button>
 				<br />
 				{blog.author}
 				<br />
