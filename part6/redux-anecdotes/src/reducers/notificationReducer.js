@@ -1,18 +1,28 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const notificationSlice = createSlice({
-    name: "notificat// eslint-disable-next-line no-unused-varsion",
+    name: "notification",
     initialState: "",
     reducers: {
-        setNotification(state, action) {
+        showNotification(state, action) {
             return action.payload;
         },
 
         removeNotification(state, action) {
-            return action.payload;
+            return "";
         }
     }
 });
 
-export const { setNotification, removeNotification } = notificationSlice.actions
+export const setNotification = (message, duration) => {
+    return dispatch => {
+        dispatch(showNotification(message));
+
+        setTimeout(() => {
+            dispatch(removeNotification())
+        }, (duration * 1000))
+    };
+}
+
+export const { showNotification, removeNotification } = notificationSlice.actions;
 export default notificationSlice.reducer;
