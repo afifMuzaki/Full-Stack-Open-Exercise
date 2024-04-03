@@ -15,19 +15,20 @@ export const useField = (type) => {
     };
 };
 
-export const useCountry = (name = "") => {
+export const useCountry = (name) => {
     const [country, setCountry] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             if (name === "") return;
-            
-            const countryData = await axios
-                .get(`https://studies.cs.helsinki.fi/restcountries/api/name/${name.toLowerCase()}`)
-                .then(res => ({ ...res, found: true }))
-                .catch(() => ({ found: false }));
-                
-            setCountry(countryData);
+
+            try {
+                const countryData = await axios.get(`https://studies.cs.helsinki.fi/restcountries/api/name/${name.toLowerCase()}`);
+
+                setCountry({ ...countryData, found: true });
+            } catch (err) {
+                setCountry({ found: false });
+            }
         };
 
         fetchData();
