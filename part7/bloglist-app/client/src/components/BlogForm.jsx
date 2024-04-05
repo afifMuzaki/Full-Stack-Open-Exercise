@@ -1,22 +1,28 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import { createBlog } from "../reducers/blogReducer";
+import Togglable from "./Togglable";
 
-const BlogForm = ({ handleCreate }) => {
+const BlogForm = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
+  const blogFormRef = useRef();
+  const dispatch = useDispatch();
 
-  const addBlog = (e) => {
+  const handleCreate = (e) => {
     e.preventDefault();
-    handleCreate({ title, author, url });
+    dispatch(createBlog({ title, author, url }));
+    blogFormRef.current.toggleVisibility();
     setTitle("");
     setAuthor("");
     setUrl("");
   };
 
   return (
-    <div>
+    <Togglable bottonLabel="new blog" ref={blogFormRef}>
       <h2>create new</h2>
-      <form onSubmit={addBlog}>
+      <form onSubmit={handleCreate}>
         <div>
           title
           <input
@@ -52,7 +58,7 @@ const BlogForm = ({ handleCreate }) => {
         </div>
         <button type="submit">create</button>
       </form>
-    </div>
+    </Togglable>
   );
 };
 

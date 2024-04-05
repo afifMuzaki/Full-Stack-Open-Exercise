@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteBlog, likeBlog } from "../reducers/blogReducer";
 
-const Blog = ({ blog, handleUpdate, handleDelete, loggedUserId }) => {
+const Blog = ({ blog }) => {
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
   const [visibility, setVisibility] = useState(false);
 
   const blogStyle = {
@@ -15,7 +19,19 @@ const Blog = ({ blog, handleUpdate, handleDelete, loggedUserId }) => {
     setVisibility(!visibility);
   };
 
-  const likeBlog = () => {
+  const handleUpdate = (newBlog, blogId) => {
+    dispatch(likeBlog(newBlog, blogId));
+  };
+
+  const handleDelete = (blogId, title, author) => {
+    const confirm = window.confirm(`Remove blog ${title} by ${author}?`);
+
+    if (confirm) {
+      dispatch(deleteBlog(blogId, title, author));
+    }
+  };
+
+  const handleLike = () => {
     const blogData = {
       user: blog.user.id,
       likes: blog.likes + 1,
@@ -27,13 +43,8 @@ const Blog = ({ blog, handleUpdate, handleDelete, loggedUserId }) => {
     handleUpdate(blogData, blog.id);
   };
 
-  const deleteBlog = () => {
-    handleDelete(blog.id, blog.title, blog.author);
-  };
-
   const removeBtnStyle = {
-    display:
-      blog.user.id === loggedUserId || blog.user === loggedUserId ? "" : "none",
+    display: blog.user.id === user.id || blog.user === user.id ? "" : "none",
     backgroundColor: "blue",
     color: "white",
   };
@@ -54,13 +65,16 @@ const Blog = ({ blog, handleUpdate, handleDelete, loggedUserId }) => {
         <a href={blog.url}>{blog.url}</a>
         <br />
         likes <span data-testid="likes">{blog.likes}</span>{" "}
-        <button onClick={likeBlog} className="likeBtn">
+        <button onClick={handleLike} className="likeBtn">
           like
         </button>
         <br />
         {blog.author}
         <br />
-        <button style={removeBtnStyle} onClick={deleteBlog}>
+        <button
+          style={removeBtnStyle}
+          onClick={() => handleDelete(blog.id, blog.title, blog.author)}
+        >
           remove
         </button>
       </div>

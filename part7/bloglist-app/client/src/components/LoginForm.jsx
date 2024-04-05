@@ -1,18 +1,24 @@
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { userLogin } from "../reducers/userReducer";
 import FlashMessage from "./FlashMessage";
-import PropTypes from "prop-types";
 
-const LoginForm = ({
-  handleLogin,
-  username,
-  password,
-  setUsername,
-  setPassword,
-  message,
-}) => {
+const LoginForm = () => {
+  const dispatch = useDispatch();
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    dispatch(userLogin(username, password));
+    setUsername("");
+    setPassword("");
+  };
+
   return (
     <>
       <h2>log in to application</h2>
-      <FlashMessage message={message} />
+      <FlashMessage />
       <form onSubmit={handleLogin}>
         <div>
           username
@@ -38,14 +44,6 @@ const LoginForm = ({
       </form>
     </>
   );
-};
-
-LoginForm.propTypes = {
-  handleLogin: PropTypes.func.isRequired,
-  setUsername: PropTypes.func.isRequired,
-  setPassword: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
 };
 
 export default LoginForm;
