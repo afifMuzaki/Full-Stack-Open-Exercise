@@ -4,7 +4,7 @@ import blogService from "../services/blogs";
 import { setMessage } from "./messageReducer";
 
 const userSlice = createSlice({
-  name: "user",
+  name: "loggedUser",
   initialState: null,
   reducers: {
     setUser: (state, action) => {

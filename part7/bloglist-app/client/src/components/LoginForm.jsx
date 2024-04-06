@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { userLogin } from "../reducers/userReducer";
+import { userLogin } from "../reducers/authReducer";
 import FlashMessage from "./FlashMessage";
 
 const LoginForm = () => {

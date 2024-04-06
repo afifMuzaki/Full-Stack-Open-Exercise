@@ -4,7 +4,7 @@ import { deleteBlog, likeBlog } from "../reducers/blogReducer";
 
 const Blog = ({ blog }) => {
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.user);
+  const loggedUser = useSelector((state) => state.loggedUser);
   const [visibility, setVisibility] = useState(false);
 
   const blogStyle = {
@@ -44,7 +44,10 @@ const Blog = ({ blog }) => {
   };
 
   const removeBtnStyle = {
-    display: blog.user.id === user.id || blog.user === user.id ? "" : "none",
+    display:
+      blog.user.id === loggedUser.id || blog.user === loggedUser.id
+        ? ""
+        : "none",
     backgroundColor: "blue",
     color: "white",
   };

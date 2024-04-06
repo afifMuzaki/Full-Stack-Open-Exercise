@@ -1,13 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import messageReducer from "./reducers/messageReducer";
 import blogReducer from "./reducers/blogReducer";
-import userReducer from "./reducers/userReducer";
+import authReducer from "./reducers/authReducer";
+import usersReducer from "./reducers/usersReducer";
 
 const store = configureStore({
   reducer: {
     message: messageReducer,
     blogs: blogReducer,
-    user: userReducer,
+    loggedUser: authReducer,
+    users: usersReducer,
   },
 });
 
