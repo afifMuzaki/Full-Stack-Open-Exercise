@@ -1,11 +1,11 @@
 import BlogForm from "../BlogForm";
-import Blogs from "../Blogs";
+import BlogsList from "../BlogsList";
 
 const HomePage = () => {
   return (
     <div>
       <BlogForm />
-      <Blogs />
+      <BlogsList />
     </div>
   );
 };
