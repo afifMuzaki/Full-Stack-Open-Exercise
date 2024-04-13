@@ -20,44 +20,64 @@ const BlogForm = () => {
   };
 
   return (
-    <Togglable bottonLabel="new blog" ref={blogFormRef}>
-      <h2>create new</h2>
-      <form onSubmit={handleCreate}>
-        <div>
-          title
-          <input
-            placeholder="title"
-            data-testid="title"
-            type="text"
-            name="title"
-            value={title}
-            onChange={({ target }) => setTitle(target.value)}
-          />
-        </div>
-        <div>
-          author
-          <input
-            placeholder="author"
-            data-testid="author"
-            type="text"
-            name="author"
-            value={author}
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url
-          <input
-            placeholder="url"
-            data-testid="url"
-            type="text"
-            name="url"
-            value={url}
-            onChange={({ target }) => setUrl(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
+    <Togglable title="Blog List" bottonLabel="new blog" ref={blogFormRef}>
+      <h4 className="title is-4 mb-1">Create New</h4>
+      <div className="columns mb-0">
+        <form onSubmit={handleCreate} className="column is-half">
+          <div className="field">
+            <label htmlFor="title" className="label">
+              title
+            </label>
+            <div className="control">
+              <input
+                id="title"
+                className="input"
+                placeholder="title"
+                data-testid="title"
+                type="text"
+                name="title"
+                value={title}
+                onChange={({ target }) => setTitle(target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="field">
+            <label htmlFor="author" className="label">
+              author
+            </label>
+            <input
+              id="author"
+              className="input"
+              placeholder="author"
+              data-testid="author"
+              type="text"
+              name="author"
+              value={author}
+              onChange={({ target }) => setAuthor(target.value)}
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="url" className="label">
+              url
+            </label>
+            <input
+              id="url"
+              className="input"
+              placeholder="url"
+              data-testid="url"
+              type="text"
+              name="url"
+              value={url}
+              onChange={({ target }) => setUrl(target.value)}
+            />
+          </div>
+          <button type="submit" className="button is-link is-small">
+            create
+          </button>
+        </form>
+      </div>
     </Togglable>
   );
 };

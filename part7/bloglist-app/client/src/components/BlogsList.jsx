@@ -4,14 +4,6 @@ import { useSelector } from "react-redux";
 const BlogsList = () => {
   const blogs = [...useSelector((state) => state.blogs)];
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: "solid",
-    borderWidth: 1,
-    marginBottom: 5,
-  };
-
   if (blogs.length < 1) return <p>no saved blogs yet</p>;
 
   return (
@@ -19,9 +11,13 @@ const BlogsList = () => {
       {blogs
         .sort((a, b) => b.likes - a.likes)
         .map((blog) => (
-          <div key={blog.id} style={blogStyle}>
-            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-          </div>
+          <Link
+            key={blog.id}
+            className="button is-link is-outlined is-block mb-1"
+            to={`/blogs/${blog.id}`}
+          >
+            {blog.title}
+          </Link>
         ))}
     </>
   );

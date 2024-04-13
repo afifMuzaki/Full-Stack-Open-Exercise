@@ -28,18 +28,19 @@ const App = () => {
   if (!loggedUser) return <LoginForm />;
 
   return (
-    <>
+    <div>
       <Navigation />
-      <h2>blog app</h2>
-      <FlashMessage />
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/users/:id" element={<User user={user} />} />
-        <Route path="/blogs/" element={<Navigate replace to="/" />} />
-        <Route path="/blogs/:id" element={<Blog />} />
-      </Routes>
-    </>
+      <div className="container my-2">
+        <FlashMessage />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/users/:id" element={<User user={user} />} />
+          <Route path="/blogs/" element={<Navigate replace to="/" />} />
+          <Route path="/blogs/:id" element={<Blog />} />
+        </Routes>
+      </div>
+    </div>
   );
 };
 

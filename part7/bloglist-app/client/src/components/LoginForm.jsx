@@ -16,33 +16,39 @@ const LoginForm = () => {
   };
 
   return (
-    <>
-      <h2>log in to application</h2>
+    <div className="container">
+      <h4 className="title is-4 has-text-centered">log in to application</h4>
       <FlashMessage />
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
-            type="text"
-            data-testid="username"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-          />
-        </div>
-        <div>
-          password
-          <input
-            type="password"
-            data-testid="password"
-            value={password}
-            name="Password"
-            onChange={({ target }) => setPassword(target.value)}
-          />
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </>
+      <div className="is-flex is-justify-content-center is-align-items-center mt-4">
+        <form onSubmit={handleLogin} className="card p-4">
+          <div className="field">
+            <label className="label">Username</label>
+            <input
+              className="input is-small"
+              type="text"
+              data-testid="username"
+              value={username}
+              name="Username"
+              onChange={({ target }) => setUsername(target.value)}
+            />
+          </div>
+          <div>
+            <label className="label">Password</label>
+            <input
+              className="input is-small"
+              type="password"
+              data-testid="password"
+              value={password}
+              name="Password"
+              onChange={({ target }) => setPassword(target.value)}
+            />
+          </div>
+          <button className="button is-primary is-small my-3" type="submit">
+            login
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 

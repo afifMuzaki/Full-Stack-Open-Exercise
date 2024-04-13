@@ -9,6 +9,7 @@ const mongoose = require('mongoose');
 const loginRouter = require('./controllers/login');
 const blogRouter = require('./controllers/blogs');
 const userRouter = require('./controllers/users');
+const commentRouter = require('./controllers/comments');
 
 mongoose.set('strictQuery', false);
 
@@ -35,7 +36,7 @@ if (process.env.NODE_ENV === 'test') {
 
 app.use('/api/login', loginRouter);
 app.use('/api/users', userRouter);
-app.use('/api/blogs', middleware.userExtractor, blogRouter);
+app.use('/api/blogs', middleware.userExtractor, blogRouter, commentRouter);
 
 app.use(middleware.errorHandler);
 app.use(middleware.unknownEndpoint);
