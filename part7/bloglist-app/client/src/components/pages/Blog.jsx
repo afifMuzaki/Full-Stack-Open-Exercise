@@ -1,29 +1,90 @@
-import { useState } from "react";
-// import { useDispatch, useSelector } from "react-redux";
-// import { likeBlog, blogComment, deleteBlog } from "../../reducers/blogReducer";
+/* eslint-disable @stylistic/js/indent */
+import { useContext, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { IndexContext } from "../../context/IndexContext";
+import blogService from "../../services/blogs";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { showMessage, findAndUpdateBlog, findAndAddComment } from "../../utils";
 
 const Blog = () => {
-  // const dispatch = useDispatch();
-  const loggedUser = useSelector((state) => state.loggedUser);
-  const blogs = useSelector((state) => state.blogs);
+  const { authUser } = useContext(IndexContext);
+  const { blogs } = useContext(IndexContext);
+  const { message } = useContext(IndexContext);
   const blogId = useParams().id;
   const blog = blogs.find((blog) => blog.id === blogId);
   const [comment, setComment] = useState("");
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const handleUpdate = (newBlog, blogId) => {
-    dispatch(likeBlog(newBlog, blogId));
-  };
+  const deleteBlog = useMutation({
+    mutationFn: blogService.destroy,
+    onSuccess: () => {
+      const blogs = queryClient.getQueryData(["blogs"]);
+      queryClient.setQueryData(
+        ["blogs"],
+        blogs.filter((blog) => blog.id !== blogId),
+      );
+      showMessage(
+        {
+          type: "success",
+          text: `Blog ${blog.title} by ${blog.author} deleted`,
+        },
+        5,
+        message.dispatch,
+      );
+    },
+    onError: (err) => {
+      showMessage(
+        { type: "error", text: err.response.data.error },
+        5,
+        message.dispatch,
+      );
+    },
+  });
 
-  const handleDelete = (blogId, title, author) => {
-    const confirm = window.confirm(`Remove blog ${title} by ${author}?`);
+  const updateBlog = useMutation({
+    mutationFn: blogService.update,
+    onSuccess: (updatedBlog) => {
+      const blogs = queryClient.getQueryData(["blogs"]);
+      queryClient.setQueryData(
+        ["blogs"],
+        findAndUpdateBlog(blogs, updatedBlog),
+      );
+      showMessage(
+        {
+          type: "success",
+          text: `Blog ${updatedBlog.title} by ${updatedBlog.author} liked`,
+        },
+        5,
+        message.dispatch,
+      );
+    },
+    onError: (err) => {
+      showMessage(
+        { type: "error", text: err.response.data.error },
+        5,
+        message.dispatch,
+      );
+    },
+  });
 
-    if (confirm) {
-      dispatch(deleteBlog(blogId, title, author));
-      navigate("/");
-    }
-  };
+  const addComment = useMutation({
+    mutationFn: blogService.addComment,
+    onSuccess: (addedComment) => {
+      const blogs = queryClient.getQueryData(["blogs"]);
+      queryClient.setQueryData(
+        ["blogs"],
+        findAndAddComment(blogs, addedComment),
+      );
+    },
+    onError: (err) => {
+      showMessage(
+        { type: "error", text: err.response.data.error },
+        5,
+        message.dispatch,
+      );
+    },
+  });
 
   const handleLike = () => {
     const blogData = {
@@ -34,12 +95,21 @@ const Blog = () => {
       url: blog.url,
     };
 
-    handleUpdate(blogData, blog.id);
+    updateBlog.mutate({ blogData, blogId: blog.id });
+  };
+
+  const handleDelete = (blogId, title, author) => {
+    const confirm = window.confirm(`Remove blog ${title} by ${author}?`);
+
+    if (confirm) {
+      deleteBlog.mutate(blogId);
+      navigate("/");
+    }
   };
 
   const handleComment = (e) => {
     e.preventDefault();
-    dispatch(blogComment(blog.id, { comment }));
+    addComment.mutate({ blogId: blog.id, comment: { comment } });
     setComment("");
   };
 
@@ -49,7 +119,8 @@ const Blog = () => {
     <div>
       <h4 className="title is-4 mb-1">
         {`${blog.title} by ${blog.author}`}
-        {loggedUser.id === blog.user || loggedUser.id === blog.user.id ? (
+        {authUser.loggedUser.id === blog.user ||
+        authUser.loggedUser.id === blog.user.id ? (
           <button
             onClick={() => handleDelete(blog.id, blog.title, blog.author)}
             className="button is-danger is-small ml-3"

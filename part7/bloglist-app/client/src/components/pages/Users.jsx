@@ -1,9 +1,15 @@
 import { Link } from "react-router-dom";
-import { useContext } from "react";
-import { IndexContext } from "../../context/IndexContext";
+import userService from "../../services/users";
+import { useQuery } from "@tanstack/react-query";
 
 const Users = () => {
-  const { users } = useContext(IndexContext);
+  const usersResult = useQuery({
+    queryKey: ["users"],
+    queryFn: userService.getAll,
+    enabled: true,
+  });
+
+  const users = usersResult.data;
   let number = 1;
 
   return (

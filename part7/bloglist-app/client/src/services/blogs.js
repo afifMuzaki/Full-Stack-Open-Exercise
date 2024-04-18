@@ -21,7 +21,7 @@ const create = async (blogData) => {
   return response.data;
 };
 
-const update = async (blogData, blogId) => {
+const update = async ({ blogData, blogId }) => {
   const response = await axios.put(`${baseUrl}/${blogId}`, blogData);
   return response.data;
 };
@@ -35,7 +35,7 @@ const destroy = async (blogId) => {
   return response.data;
 };
 
-const addComment = async (blogId, comment) => {
+const addComment = async ({ blogId, comment }) => {
   const response = await axios.post(`${baseUrl}/${blogId}/comments`, comment);
   return response.data;
 };

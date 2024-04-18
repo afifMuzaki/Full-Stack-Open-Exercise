@@ -4,11 +4,12 @@ import loginService from "../services/login";
 import blogService from "../services/blogs";
 import { useMutation } from "@tanstack/react-query";
 import { IndexContext } from "../context/IndexContext";
+import { showMessage } from "../utils";
 
 const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const { authUser } = useContext(IndexContext);
+  const { authUser, message } = useContext(IndexContext);
 
   const loginMutation = useMutation({
     mutationFn: loginService.login,
@@ -16,6 +17,13 @@ const LoginForm = () => {
       blogService.setToken(user.token);
       localStorage.setItem("loggedUser", JSON.stringify(user));
       authUser.setLoggedUser(user);
+    },
+    onError: () => {
+      showMessage(
+        { type: "error", text: "wrong username or password" },
+        5,
+        message.dispatch,
+      );
     },
   });
 

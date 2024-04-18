@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-// import { userLogout } from "../reducers/authReducer";
 import { IndexContext } from "../context/IndexContext";
 import { useContext } from "react";
 
@@ -7,7 +6,8 @@ const Navigation = () => {
   const { authUser } = useContext(IndexContext);
 
   const handleLogout = () => {
-    // dispatch(userLogout());
+    localStorage.removeItem("loggedUser");
+    authUser.setLoggedUser(null);
   };
 
   if (!authUser.loggedUser) return null;

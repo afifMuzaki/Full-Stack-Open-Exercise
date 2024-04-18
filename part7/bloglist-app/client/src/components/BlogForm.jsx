@@ -28,6 +28,13 @@ const BlogForm = () => {
         message.dispatch,
       );
     },
+    onError: (err) => {
+      showMessage(
+        { type: "error", text: err.response.data.error },
+        5,
+        message.dispatch,
+      );
+    },
   });
 
   const handleCreate = (e) => {
