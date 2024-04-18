@@ -1,16 +1,27 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
-import { userLogin } from "../reducers/authReducer";
+import { useContext, useState } from "react";
 import FlashMessage from "./FlashMessage";
+import loginService from "../services/login";
+import blogService from "../services/blogs";
+import { useMutation } from "@tanstack/react-query";
+import { IndexContext } from "../context/IndexContext";
 
 const LoginForm = () => {
-  const dispatch = useDispatch();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const { authUser } = useContext(IndexContext);
+
+  const loginMutation = useMutation({
+    mutationFn: loginService.login,
+    onSuccess: (user) => {
+      blogService.setToken(user.token);
+      localStorage.setItem("loggedUser", JSON.stringify(user));
+      authUser.setLoggedUser(user);
+    },
+  });
 
   const handleLogin = (e) => {
     e.preventDefault();
-    dispatch(userLogin(username, password));
+    loginMutation.mutate({ username, password });
     setUsername("");
     setPassword("");
   };

@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { likeBlog, blogComment, deleteBlog } from "../../reducers/blogReducer";
+// import { useDispatch, useSelector } from "react-redux";
+// import { likeBlog, blogComment, deleteBlog } from "../../reducers/blogReducer";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Blog = () => {
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
   const loggedUser = useSelector((state) => state.loggedUser);
   const blogs = useSelector((state) => state.blogs);
   const blogId = useParams().id;

@@ -1,11 +1,14 @@
-import { useSelector } from "react-redux";
+import { useContext } from "react";
+import { IndexContext } from "../context/IndexContext";
 
 const FlashMessage = () => {
-  const message = useSelector((state) => state.message);
+  const { message } = useContext(IndexContext);
 
-  if (!message) return null;
+  if (!message.value) return null;
 
-  return <div className={`message ${message.type}`}>{message.text}</div>;
+  return (
+    <div className={`message ${message.value.type}`}>{message.value.text}</div>
+  );
 };
 
 export default FlashMessage;

@@ -1,16 +1,16 @@
 import { Link } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
-import { userLogout } from "../reducers/authReducer";
+// import { userLogout } from "../reducers/authReducer";
+import { IndexContext } from "../context/IndexContext";
+import { useContext } from "react";
 
 const Navigation = () => {
-  const dispatch = useDispatch();
-  const loggedUser = useSelector((state) => state.loggedUser);
+  const { authUser } = useContext(IndexContext);
 
   const handleLogout = () => {
-    dispatch(userLogout());
+    // dispatch(userLogout());
   };
 
-  if (!loggedUser) return null;
+  if (!authUser.loggedUser) return null;
 
   return (
     <nav
@@ -50,7 +50,7 @@ const Navigation = () => {
 
       <div className="navbar-end">
         <div className="navbar-item has-dropdown is-hoverable is-right">
-          <a className="navbar-link">{loggedUser.name}</a>
+          <a className="navbar-link">{authUser.loggedUser.name}</a>
           <div
             className="navbar-dropdown has-background-dark"
             style={{ border: "none" }}

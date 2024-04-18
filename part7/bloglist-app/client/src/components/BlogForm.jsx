@@ -1,18 +1,38 @@
 import { useRef, useState } from "react";
-import { useDispatch } from "react-redux";
-import { createBlog } from "../reducers/blogReducer";
 import Togglable from "./Togglable";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import blogService from "../services/blogs";
+import { useContext } from "react";
+import { IndexContext } from "../context/IndexContext";
+import { showMessage } from "../utils";
 
 const BlogForm = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [url, setUrl] = useState("");
   const blogFormRef = useRef();
-  const dispatch = useDispatch();
+  const { message } = useContext(IndexContext);
+  const queryClient = useQueryClient();
+
+  const createBlog = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData(["blogs"]);
+      queryClient.setQueryData(["blogs"], blogs.concat(newBlog));
+      showMessage(
+        {
+          type: "success",
+          text: `a new blog ${newBlog.title} by ${newBlog.author} added`,
+        },
+        5,
+        message.dispatch,
+      );
+    },
+  });
 
   const handleCreate = (e) => {
     e.preventDefault();
-    dispatch(createBlog({ title, author, url }));
+    createBlog.mutate({ title, author, url });
     blogFormRef.current.toggleVisibility();
     setTitle("");
     setAuthor("");

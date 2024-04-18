@@ -1,8 +1,9 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { IndexContext } from "../context/IndexContext";
 
 const BlogsList = () => {
-  const blogs = [...useSelector((state) => state.blogs)];
+  const { blogs } = useContext(IndexContext);
 
   if (blogs.length < 1) return <p>no saved blogs yet</p>;
 

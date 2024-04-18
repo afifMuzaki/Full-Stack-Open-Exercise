@@ -1,16 +1,10 @@
 import { Link } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { fetchUsers } from "../../reducers/usersReducer";
+import { useContext } from "react";
+import { IndexContext } from "../../context/IndexContext";
 
 const Users = () => {
-  const dispatch = useDispatch();
-  const users = useSelector((state) => state.users);
+  const { users } = useContext(IndexContext);
   let number = 1;
-
-  useEffect(() => {
-    dispatch(fetchUsers());
-  }, [dispatch]);
 
   return (
     <div>

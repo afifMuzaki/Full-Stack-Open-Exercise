@@ -1,6 +1,13 @@
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { IndexContext } from "../../context/IndexContext";
+import { useMatch } from "react-router-dom";
 
-const User = ({ user }) => {
+const User = () => {
+  const { users } = useContext(IndexContext);
+  const match = useMatch("/users/:id");
+  const user = match ? users.find((user) => user.id === match.params.id) : null;
+
   if (!user) return null;
   const userBlogs = [...user.blogs];
 
